@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="background" style="z-index: -2;text-align: center">
+    <div id="sphere-wrap">
+        <canvas id="sphere"></canvas>
+    </div>
+</div>
+<video class="background" preload="auto" autoplay loop playsinline muted>
+    <source src="../static/background.mp4" type="video/mp4" />
+</video>
+<form id="certificateUser" class="form" action="" method="post" novalidate>
+    <h2 class="title">Очередь<span id="id">Сейчас в очереди - </span></h2>
+    {% for ticket in tickets %}
+        <span class="form-item__label">{{ ticket.id }}
+    {% endfor %}
+    <div class="form-item">
+</form>
+<script src="../static/script.js"></script>
+{% endblock %}

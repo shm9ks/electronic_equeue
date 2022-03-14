@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .form-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.form-item:last-child {
+    margin-bottom: 0;
+}
+
+.form-item__label {
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.form-item__input {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    outline: none;
+    padding: 8px;
+}
+
+.form-item__input:hover {
+    border: 1px solid #5c5c5c;
+}
+
+.form-item__input:focus {
+    border: 1px solid #5c5c5c;
+}
+</style>
+<video class="background" preload="auto" autoplay loop playsinline muted>
+    <source src="../static/background.mp4" type="video/mp4" />
+</video>
+<div class="background"></div>
+<form id="registrationUser" class="form" action="" method="post" novalidate>
+    <h2 class="title">Регистрация</h2>
+    {{ form.hidden_tag() }}
+    <div class="form-item">
+        <label for="last_name" class="form-item__label">Фамилия</label>
+        {{ form.last_name(class='label_reg', size=32) }}
+    </div>
+    <div class="form-item">
+        <label for="first_name" class="form-item__label">Имя</label>
+        {{ form.first_name(class='label_reg', size=32) }}
+    </div>
+    <div class="form-item">
+        <label for="middle_name" class="form-item__label">Имя</label>
+        {{ form.middle_name(class='label_reg', size=32) }}
+    </div>
+    <div class="form-item">
+        <label for="planet_name" class="form-item__label">Планета</label>
+        {{ form.name_cosmic(class='label_reg', size=32) }}
+    </div>
+    <div class="form-item">
+        <p>{{ form.submit(class="submit") }}</p>
+    </div>
+</form>
+{% endblock %}
