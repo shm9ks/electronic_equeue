@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import render_template
+from flask import render_template, jsonify
 from app.forms import *
 from app.models import *
 from app import app
@@ -8,6 +8,15 @@ from app import app
 @app.route('/index')
 def index():
     return render_template('all.html', tickets=db.session.query(ticket).all())
+
+@app.route('/api/get_queue')
+def get_queue():
+    tickets = db.session.query(ticket).all()
+    data = []
+    for i in tickets:
+        data.append(i.id)
+    print(data)
+    return jsonify(data)
 
 @app.route('/doctor')
 def doctor():
