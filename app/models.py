@@ -7,6 +7,7 @@ class ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_name = db.Column(db.String(64))
     active = db.Column(db.Boolean, default=True)
+    reception = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '<Ticket {}>'.format(self.username)
