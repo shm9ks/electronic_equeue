@@ -10,10 +10,10 @@ class ticket(db.Model):
     reception = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return '<Ticket {}>'.format(self.username)
+        return '<Ticket {}>'.format(self.id)
 
     def repr(self):
-        return ''.format(self.username)
+        return ''.format(self.id)
 
 @login.user_loader
 def load_user(id):

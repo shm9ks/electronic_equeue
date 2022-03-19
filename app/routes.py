@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, jsonify
-from flask_json import FlaskJSON, JsonError, json_response, as_json
+from flask import render_template, flash
+from flask_json import as_json
 from app.forms import *
 from app.models import *
 from app import app
+import json
 
 
 @app.route('/')
@@ -15,9 +16,9 @@ def index():
 @app.route('/api/get/<method>')
 @as_json
 def api(method):
+    data = {}
     if method == "queue":
         tickets = db.session.query(ticket).all()
-        data = {}
         for i in tickets:
             if i.active and not i.reception:
                 data[str(i.id)] = False
@@ -27,7 +28,6 @@ def api(method):
 
     if method == "queue_doctor":
         tickets = db.session.query(ticket).all()
-        data = {}
         for i in tickets:
             if i.active and not i.reception:
                 data[str(i.id)] = i.last_name
@@ -39,18 +39,52 @@ def api(method):
                     data.update({'reception': tmp})
         return data
 
-    return "Bad request"
+    return "error"
 
 
 @app.route('/doctor', methods=['GET', 'POST'])
 def doctor():
-    print(db.session.query(ticket.active, ticket.reception, ticket.id).all())
+    #print(db.session.query(ticket.active, ticket.reception, ticket.id).all())
     if queue().data['nextq'] and queue().data['stopq']:
-        return "Произошла ошибка, попробуйте открыть страницу в новой вкладке"
+        flash("Произошла ошибка, попробуйте открыть страницу в новой вкладке")
     if queue().data['nextq']:
-        print("nextq")
+        queue_doc = json.loads(api("queue_doctor").data.decode('utf-8'))
+        if queue_doc.get('reception'):
+            tick = db.session.query(ticket).filter(ticket.id == (queue_doc['reception'][0])).all()[0]
+            tick.active = False
+            tick.reception = False
+            db.session.commit()
+            try:
+                tick = db.session.query(ticket).filter(ticket.id == (queue_doc['reception'][0]+1)).all()[0]
+                tick.reception = True
+                db.session.commit()
+                queue_doc = json.loads(api("queue_doctor").data.decode('utf-8'))
+                flash(f"Следующий пациент - ID тикета - {queue_doc['reception'][0]}, фамилия {queue_doc['reception'][1]}")
+            except:
+                flash("Не удалось найти пациента в очереди")
+        else:
+            flash_str = ''
+            try:
+                if list(queue_doc.keys())[0].isdigit():
+                    tick = db.session.query(ticket).filter(ticket.id == (list(queue_doc.keys())[0])).all()[0]
+                    tick.active = True
+                    tick.reception = True
+                    db.session.commit()
+            except:
+                flash_str = "Ошибка очереди, возможна она пуста"
+            if flash_str == '':
+                queue_doc = json.loads(api("queue_doctor").data.decode('utf-8'))
+                flash_str = f"Следующий пациент - ID тикета - {queue_doc['reception'][0]}, фамилия {queue_doc['reception'][1]}"
+            flash(flash_str)
+
     if queue().data['stopq']:
-        print("stopq")
+        queue_doc = json.loads(api("queue_doctor").data.decode('utf-8'))
+        if queue_doc.get('reception'):
+            tick = db.session.query(ticket).filter(ticket.id == (queue_doc['reception'][0])).all()[0]
+            tick.active = False
+            tick.reception = False
+            db.session.commit()
+        flash('Вы остановили прием пациентов')
     return render_template('doctor.html', tickets=db.session.query(ticket).all(), queue=queue())
 
 
