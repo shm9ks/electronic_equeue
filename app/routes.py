@@ -13,32 +13,32 @@ def index():
     return render_template('all.html', tickets=db.session.query(ticket).all())
 
 
-@app.route('/api/get/<method>')
+@app.route('/api/<method>/<mean>')
 @as_json
-def api(method):
-    data = {}
-    if method == "queue":
-        tickets = db.session.query(ticket).all()
-        for i in tickets:
-            if i.active and not i.reception:
-                data[str(i.id)] = False
-            if i.active == i.reception == True:
-                data[str(i.id)] = True
-        return data
+def api(mean, method):
+    if method == "get":
+        data = {}
+        if mean == "queue":
+            tickets = db.session.query(ticket).all()
+            for i in tickets:
+                if i.active and not i.reception:
+                    data[str(i.id)] = False
+                if i.active == i.reception == True:
+                    data[str(i.id)] = True
+            return data
 
-    if method == "queue_doctor":
-        tickets = db.session.query(ticket).all()
-        for i in tickets:
-            if i.active and not i.reception:
-                data[str(i.id)] = i.last_name
-            tmp = []
-            if i.active == i.reception == True:
-                tmp.append(i.id)
-                tmp.append(i.last_name)
-                if str(tmp) != "[]" and not (data.get('reception')):
-                    data.update({'reception': tmp})
-        return data
-
+        if mean == "queue_doctor":
+            tickets = db.session.query(ticket).all()
+            for i in tickets:
+                if i.active and not i.reception:
+                    data[str(i.id)] = i.last_name
+                tmp = []
+                if i.active == i.reception == True:
+                    tmp.append(i.id)
+                    tmp.append(i.last_name)
+                    if str(tmp) != "[]" and not (data.get('reception')):
+                        data.update({'reception': tmp})
+            return data
     return "error"
 
 
