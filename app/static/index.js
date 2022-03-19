@@ -14,6 +14,12 @@ console.log(typeof(jsonObj));
 console.log(Object.keys(jsonObj));
 console.log(typeof(Object.keys(jsonObj)));
 for (var i in jsonObj){
-  console.log("obj." + i + " = " + jsonObj[i]);
+    if (!isNaN(parseFloat(i)) && isFinite(i)){
+        console.log("Пришло число");
+        console.log("jsonObj." + i + " = " + jsonObj[i]);
+    } else{
+        console.log('Пришло не число, вероятно ошибка(error, смотри api - routes.py)');
+        console.log(i);
+    }
 }
 }
