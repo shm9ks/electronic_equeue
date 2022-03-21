@@ -15,7 +15,7 @@ def index():
 
 @app.route('/api/<method>/<mean>')
 @as_json
-def api(mean, method):
+def api(method, mean):
     if method == "get":
         data = {}
         if mean == "queue":
@@ -48,7 +48,7 @@ def doctor():
     if queue().data['nextq'] and queue().data['stopq']:
         flash("Произошла ошибка, попробуйте открыть страницу в новой вкладке")
     if queue().data['nextq']:
-        queue_doc = json.loads(api("get", "queue_doctor").data.decode('utf-8'))
+        queue_doc = json.loads(api(method="get", mean="queue_doctor").data.decode('utf-8'))
         if queue_doc.get('reception'):
             tick = db.session.query(ticket).filter(ticket.id == (queue_doc['reception'][0])).all()[0]
             tick.active = False
@@ -58,7 +58,7 @@ def doctor():
                 tick = db.session.query(ticket).filter(ticket.id == (queue_doc['reception'][0]+1)).all()[0]
                 tick.reception = True
                 db.session.commit()
-                queue_doc = json.loads(api("get", "queue_doctor").data.decode('utf-8'))
+                queue_doc = json.loads(api(method="get", mean="queue_doctor").data.decode('utf-8'))
                 flash(f"Следующий пациент - ID тикета - {queue_doc['reception'][0]}, фамилия {queue_doc['reception'][1]}")
             except:
                 flash("Не удалось найти пациента в очереди")
@@ -73,12 +73,12 @@ def doctor():
             except:
                 flash_str = "Ошибка очереди, возможна она пуста"
             if flash_str == '':
-                queue_doc = json.loads(api("get", "queue_doctor").data.decode('utf-8'))
+                queue_doc = json.loads(api(method="get", mean="queue_doctor").data.decode('utf-8'))
                 flash_str = f"Следующий пациент - ID тикета - {queue_doc['reception'][0]}, фамилия {queue_doc['reception'][1]}"
             flash(flash_str)
 
     if queue().data['stopq']:
-        queue_doc = json.loads(api("get", "queue_doctor").data.decode('utf-8'))
+        queue_doc = json.loads(api(method="get", mean="queue_doctor").data.decode('utf-8'))
         if queue_doc.get('reception'):
             tick = db.session.query(ticket).filter(ticket.id == (queue_doc['reception'][0])).all()[0]
             tick.active = False
